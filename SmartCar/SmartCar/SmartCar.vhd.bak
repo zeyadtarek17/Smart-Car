@@ -1,0 +1,53 @@
+library ieee;
+library work;
+use ieee.std_logic.all;
+use work.segment_package.all;
+
+
+entity smart is
+port(US,IR1,IR2 : IN std_logic;
+		ALERT: OUT std_logic_vector(34 downto 0);
+		motor : OUT std_logic_vector(3 downto 0));
+end smart;
+
+architecture move of smart is
+
+process(US,IR1,IR2)
+
+begin
+if US'event and US='1' then
+motor <="0000";
+if US'event and US='0' then
+motor <="1111";
+if IR1'event then 
+segment portmap(IR1,IR2,ALERT);
+if IR2'event then 
+segment portmap(IR1,IR2,ALERT);
+
+
+
+Entity segment is 
+port(bcd1,bcd2 :IN std_logic;
+		led: OUT std_logic (34 downto 0));
+end segment;
+
+
+architecture seg of segment is
+signal andsensor std_logic;
+begin
+andsensor <=bcd1 and bcd2
+process(andsensor)
+case ORsensor is
+When "0"=>leds<="11111010000110110111100001010001111";
+when others=>leds<="00000000000000000000000000000000000";
+end case;
+end process;
+end seg;
+
+
+package segment_package is
+component segment 
+port(bcd1,bcd2 :IN std_logic;
+		led: OUT std_logic (34 downto 0));
+end component;
+end segment_package;
